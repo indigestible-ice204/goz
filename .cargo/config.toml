@@ -1,0 +1,11 @@
+# Static CRT so a shipped gozd.exe/goz.exe does not need vcruntime140.dll on the
+# target machine. gozd runs as a Windows service, where a missing DLL surfaces
+# as an opaque SCM start failure rather than a useful error.
+#
+# CAVEAT: cargo takes rustflags from the FIRST matching source only, and the
+# RUSTFLAGS env var outranks these target entries. Any job that exports RUSTFLAGS
+# (CI does, for `-D warnings`) silently builds WITHOUT crt-static. That is
+# harmless today because CI ships no binaries; a future release job must either
+# leave RUSTFLAGS unset or carry `-C target-feature=+crt-static` itself.
+[target.'cfg(all(target_family = "windows", target_env = "msvc"))']
+rustflags = ["-C", "target-feature=+crt-static"]

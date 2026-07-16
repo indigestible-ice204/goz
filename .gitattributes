@@ -1,0 +1,4 @@
+# Normalize line endings: store everything as LF in the repo, so a checkout on
+# any OS is consistent and diffs never churn on CRLF/LF alone. Git still checks
+# out with native endings on Windows working copies.
+* text=auto eol=lf

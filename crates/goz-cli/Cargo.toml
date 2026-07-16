@@ -1,0 +1,25 @@
+[package]
+name = "goz-cli"
+description = "goz: the CLI client. es.exe-compatible flags, blocking named-pipe client"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+publish = false
+
+[[bin]]
+name = "goz"
+path = "src/main.rs"
+
+[dependencies]
+goz-core = { path = "../goz-core" }
+serde_json.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+jiff.workspace = true
+goz-winfs = { path = "../goz-winfs" }
+mimalloc.workspace = true
+
+[lints]
+workspace = true

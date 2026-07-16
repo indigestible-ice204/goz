@@ -1,0 +1,37 @@
+[package]
+name = "goz-core"
+description = "Pure, OS-agnostic core of goz: USN/MFT parsing, index, query engine, protocol, output"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+publish = false
+
+[dependencies]
+zerocopy.workspace = true
+memchr.workspace = true
+rustc-hash.workspace = true
+hashbrown.workspace = true
+rayon.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+smallvec.workspace = true
+unicode-normalization.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true
+mimalloc = "0.1"
+
+[[bench]]
+name = "query"
+harness = false
+
+[[bench]]
+name = "compact"
+harness = false
+
+[lints]
+workspace = true

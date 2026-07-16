@@ -1,0 +1,31 @@
+[package]
+name = "goz-daemon"
+description = "gozd: the goz indexing daemon. MFT bootstrap, USN journal tail, named-pipe query server, Windows service"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+publish = false
+
+[[bin]]
+name = "gozd"
+path = "src/main.rs"
+
+[dependencies]
+goz-core = { path = "../goz-core" }
+goz-winfs = { path = "../goz-winfs" }
+anyhow.workspace = true
+clap.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+tokio.workspace = true
+parking_lot.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+windows-service.workspace = true
+mimalloc.workspace = true
+libmimalloc-sys.workspace = true
+
+[lints]
+workspace = true

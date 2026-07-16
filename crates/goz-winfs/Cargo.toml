@@ -1,0 +1,18 @@
+[package]
+name = "goz-winfs"
+description = "Thin unsafe Win32 layer for goz: volume handles, journal/MFT ioctls, pipe security. Bytes and handles only; never parses."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+publish = false
+
+[target.'cfg(windows)'.dependencies]
+windows-sys.workspace = true
+# widestring intentionally unused: UTF-16 conversions here are short, well-formed
+# system strings handled with std (`encode_utf16` / `from_utf16_lossy`); NTFS
+# record names are parsed as bytes in goz-core, not here.
+
+[lints]
+workspace = true

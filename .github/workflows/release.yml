@@ -1,0 +1,31 @@
+name: Release
+
+# Fires only when a version tag is pushed (e.g. `git tag v0.1.1 && git push
+# --tags`). Its one job is a guard: the tag must match the version in
+# Cargo.toml, so a release can never ship with a mismatched number.
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  version-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Compare the pushed tag (minus its leading `v`) against the workspace
+      # version in Cargo.toml. Fail loudly on any mismatch so the fix is to
+      # bump Cargo.toml (or retag), never to ship the two out of sync.
+      - name: Tag matches Cargo.toml version
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME#v}"
+          manifest="$(grep -m1 '^version' Cargo.toml | sed -E 's/.*"(.*)".*/\1/')"
+          echo "tag:      $tag"
+          echo "manifest: $manifest"
+          if [ "$tag" != "$manifest" ]; then
+            echo "::error::git tag v$tag does not match Cargo.toml version $manifest; bump Cargo.toml or retag"
+            exit 1
+          fi
