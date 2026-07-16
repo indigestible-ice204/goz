@@ -4,38 +4,58 @@
 //! hold for that volume set without needing to restart the service.
 //!
 //! Usage: `cargo run --release -p goz-daemon --example memsim -- <all.csv>`
+//!
+//! Windows only: it uses the mimalloc allocator and `goz_winfs::self_memory` to
+//! read the process's real footprint. On other targets it is an empty stub so
+//! `cargo build --all-targets` stays green everywhere.
 
+#[cfg(not(windows))]
+fn main() {
+    eprintln!("memsim is Windows-only (it measures the daemon's real footprint).");
+}
+
+#[cfg(windows)]
 #[global_allocator]
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
+#[cfg(windows)]
 use goz_core::index::{FrnMap, NTFS_ROOT_FRN, VolumeIndex};
+#[cfg(windows)]
 use goz_core::types::Frn;
+#[cfg(windows)]
 use goz_core::usn::record::{FILE_ATTRIBUTE_DIRECTORY, ParsedUsnRecord, USN_REASON_FILE_CREATE};
+#[cfg(windows)]
 use std::collections::{HashMap, HashSet};
+#[cfg(windows)]
 use std::io::BufRead;
 
+#[cfg(windows)]
 fn mb(b: u64) -> f64 {
     b as f64 / 1e6
 }
 
+#[cfg(windows)]
 fn private_mb() -> f64 {
     goz_winfs::self_memory()
         .map(|m| mb(m.private_bytes))
         .unwrap_or(0.0)
 }
 
+#[cfg(windows)]
 fn purge() {
     // SAFETY: mi_collect takes no pointers and is safe from any thread.
     unsafe { libmimalloc_sys::mi_collect(true) };
 }
 
 /// One entry to insert: parent record, name, is_dir.
+#[cfg(windows)]
 struct Row {
     parent_rec: u64,
     name: Vec<u8>,
     is_dir: bool,
 }
 
+#[cfg(windows)]
 fn main() {
     let csv = std::env::args().nth(1).expect("usage: memsim <all.csv>");
     let t0 = std::time::Instant::now();
@@ -110,8 +130,7 @@ fn main() {
     // Insert everything, exactly as bootstrap ENUM would.
     let t1 = std::time::Instant::now();
     let mut idx = VolumeIndex::new(NTFS_ROOT_FRN, FrnMap::sparse());
-    let mut rec_no: u64 = 1000;
-    for row in &rows {
+    for (rec_no, row) in (1000_u64..).zip(rows.iter()) {
         let r = ParsedUsnRecord {
             major_version: 3,
             frn: Frn(rec_no | (1u64 << 48)),
@@ -128,7 +147,6 @@ fn main() {
             name_lossy: false,
         };
         idx.insert_enum(&r);
-        rec_no += 1;
     }
     eprintln!("inserted {} entries in {:?}", idx.len(), t1.elapsed());
 
